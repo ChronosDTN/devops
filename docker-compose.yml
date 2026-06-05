@@ -1,0 +1,111 @@
+# ==========================================================================================
+# CONFIGURAÇÃO MULTI-CONTAINER DOCKER-COMPOSE (CHRONOS DTN)
+# EXECUTA A API SPRING BOOT E O BANCO DE DADOS ORACLE EM UMA REDE ISOLADA COM PERSISTÊNCIA
+# ==========================================================================================
+
+# Bloco principal que declara os serviços/containers que compõem o ecossistema do gateway.
+services:
+
+  # ----------------------------------------------------------------------------------------
+  # SERVIÇO 1: BANCO DE DADOS ORACLE XE
+  # Banco de dados de produção contendo as tabelas do ledger e a procedure de correção.
+  # ----------------------------------------------------------------------------------------
+  db:
+    # Utiliza uma imagem pré-configurada leve e amplamente usada do Oracle Database Express Edition.
+    image: gvenzl/oracle-xe:21-slim
+    
+    # Nome físico exclusivo do container incorporando o RM fictício do aluno (Ex: rm93842).
+    container_name: rm93842-oracle-db
+    
+    # Reinicia o container automaticamente caso ele falhe ou pare de funcionar de forma inesperada.
+    restart: always
+    
+    # Define as variáveis de ambiente necessárias para a inicialização padrão da instância do banco.
+    environment:
+      # Define a senha administrativa do usuário SYSTEM necessária para o primeiro login de root.
+      - ORACLE_PASSWORD=ChronosSecurePassword2026
+      # Cria um banco de dados plugável interno (PDB) customizado para organizar os dados.
+      - ORACLE_DATABASE=CHRONOS_DB
+      # Configura o fuso horário oficial como UTC para facilitar a auditoria de registros espaciais.
+      - TZ=UTC
+      
+    # Mapeia portas físicas da máquina hospedeira para comunicação direta de rede com o container.
+    ports:
+      # Mapeia a porta padrão 1521 do Oracle Database Listener externa para depuração local em IDEs.
+      - "1521:1521"
+      
+    # Associa volumes de dados externos para evitar a perda física dos dados gravados em banco.
+    volumes:
+      # Monta o volume nomeado 'oracle_volume' para a pasta de dados oficial do Oracle dentro do container.
+      - oracle-data-volume:/opt/oracle/oradata
+      
+    # Associa o container a uma rede isolada definida localmente no final do arquivo.
+    networks:
+      # Conecta o banco à rede privada virtual interplanetária 'dtn-mesh-net'.
+      - dtn-mesh-net
+
+  # ----------------------------------------------------------------------------------------
+  # SERVIÇO 2: API BACKEND (SPRING BOOT)
+  # Serviço principal do gateway financeiro responsável por expor endpoints REST e gerenciar o buffer.
+  # ----------------------------------------------------------------------------------------
+  api:
+    # Instrução para construir a imagem customizada utilizando o arquivo Dockerfile local.
+    build:
+      # Define o diretório atual de execução do docker-compose como contexto do build da imagem.
+      context: .
+      # Especifica o arquivo Dockerfile customizado localizado na subpasta devops.
+      dockerfile: devops/Dockerfile
+      
+    # Nome físico exclusivo do container contendo o RM fictício do aluno (Ex: rm93842).
+    container_name: rm93842-spring-api
+    
+    # Garante reinicialização contínua em caso de panes para manter a alta disponibilidade do nó local.
+    restart: always
+    
+    # Depende da subida bem-sucedida do banco de dados antes de iniciar o processo do backend.
+    depends_on:
+      # Define a dependência explícita ao serviço 'db' criado anteriormente.
+      db:
+        # Garante que a API só inicia se o container do banco estiver íntegro e em execução operacional.
+        condition: service_healthy
+        
+    # Especifica variáveis de ambiente dinâmicas injetadas na aplicação Spring Boot em tempo de execução.
+    environment:
+      # Altera o perfil ativo do Spring para 'prod' (ativando recursos de performance e segurança).
+      - SPRING_PROFILES_ACTIVE=prod
+      # URL JDBC de conexão apontando diretamente para o container do banco de dados na rede interna.
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@db:1521/CHRONOS_DB
+      # Nome do usuário configurado para autenticação de dados no Oracle Database.
+      - SPRING_DATASOURCE_USERNAME=system
+      # Senha de acesso administrativo coincidente com a variável declarada no container do banco.
+      - SPRING_DATASOURCE_PASSWORD=ChronosSecurePassword2026
+      
+    # Mapeia portas lógicas para permitir requisições HTTPS/HTTP externas ao container.
+    ports:
+      # Mapeia a porta 8080 padrão do Tomcat do Spring Boot para a porta 8080 do host de desenvolvimento.
+      - "8080:8080"
+      
+    # Associa o container à mesma rede privada virtual criada para isolamento de pacotes de dados.
+    networks:
+      # Conecta a API backend à rede privada virtual 'dtn-mesh-net'.
+      - dtn-mesh-net
+
+# ------------------------------------------------------------------------------------------
+# DECLARAÇÃO DE REDES LÓGICAS (NETWORKS)
+# Define o switch virtual interno onde os containers se comunicam de forma segura.
+# ------------------------------------------------------------------------------------------
+networks:
+  # Cria e configura a rede interna isolada do tipo bridge.
+  dtn-mesh-net:
+    # Tipo de driver de rede a ser usado para comunicação isolada no mesmo host físico.
+    driver: bridge
+
+# ------------------------------------------------------------------------------------------
+# DECLARAÇÃO DE VOLUMES PERSISTENTES (VOLUMES)
+# Define o armazenamento gerenciado pelo Docker que sobrevive à exclusão física dos containers.
+# ------------------------------------------------------------------------------------------
+volumes:
+  # Volume nomeado para persistência física perpétua dos arquivos do banco Oracle XE.
+  oracle-data-volume:
+    # Utiliza o driver local nativo do docker para gerenciar os arquivos de blocos de disco no host.
+    driver: local
