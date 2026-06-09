@@ -422,7 +422,8 @@ O vídeo de demonstração deve apresentar:
 10. Acesso ao container da API;
 11. Comandos `whoami`, `pwd` e `ls -l`.
 
-Link do vídeo: **INSERIR AQUI**
+Link do vídeo: **https://youtu.be/xHC90BiSCHI?si=lhRTfqUy6SAf6zLH**
+Link do github: **https://github.com/ChronosDTN/devops**
 
 ---
 
