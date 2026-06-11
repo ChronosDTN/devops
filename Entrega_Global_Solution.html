@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Capa Global Solution - Chronos DTN</title>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { font-family: 'Arial', sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f4f4; }
+        .page { width: 210mm; height: 297mm; padding: 20mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; text-align: center; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .header { margin-top: 40mm; }
+        .header h1 { font-size: 28pt; margin: 0; color: #1a1a1a; text-transform: uppercase; letter-spacing: 2px; }
+        .header h2 { font-size: 16pt; color: #555; margin-top: 10px; font-weight: normal; }
+        .team { margin-top: 20mm; }
+        .team h3 { font-size: 14pt; margin-bottom: 20px; color: #333; text-transform: uppercase; }
+        .team table { margin: 0 auto; border-collapse: collapse; width: 65%; font-size: 13pt; }
+        .team td { padding: 12px; border-bottom: 1px solid #eee; }
+        .team td:first-child { font-weight: bold; text-align: left; width: 35%; color: #0056b3; }
+        .team td:last-child { text-align: left; }
+        .links { margin-top: 20mm; font-size: 12pt; text-align: left; padding: 0 40px; }
+        .links p { margin: 15px 0; background: #f9f9f9; padding: 15px; border-left: 4px solid #0056b3; border-radius: 4px; }
+        .links strong { display: block; margin-bottom: 5px; color: #333; }
+        .links a { color: #0056b3; text-decoration: none; word-break: break-all; }
+        .footer { margin-bottom: 20mm; font-size: 11pt; color: #777; }
+        
+        /* Ocultar sombras e fundos na hora de imprimir o PDF */
+        @media print {
+            body { background-color: white; }
+            .page { box-shadow: none; width: 100%; height: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <h1>Global Solution 2026</h1>
+            <h2>Engenharia de Software - FIAP</h2>
+            <br>
+            <h2 style="color: #000; font-weight: bold; font-size: 20pt;">Projeto: Chronos DTN</h2>
+        </div>
+        
+        <div class="team">
+            <h3>Equipe Desenvolvedora</h3>
+            <table>
+                <tr><td>RM 562744</td><td>Evellyn Ferreira</td></tr>
+                <tr><td>RM 566482</td><td>Fernando Charlles</td></tr>
+                <tr><td>RM 561279</td><td>Maicon Douglas</td></tr>
+            </table>
+        </div>
+        
+        <div class="links">
+            <p>
+                <strong>🔗 Repositório Oficial do Projeto (GitHub):</strong>
+                <a href="https://github.com/ChronosDTN">https://github.com/ChronosDTN</a>
+            </p>
+            <p>
+                <strong>▶️ Vídeo Demonstrativo:</strong>
+                <a href="https://youtu.be/xHC90BiSCHI?si=u_pJ5J5NdSyuxwvs">https://youtu.be/xHC90BiSCHI?si=u_pJ5J5NdSyuxwvs</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            São Paulo, SP<br>2026
+        </div>
+    </div>
+</body>
+</html>
